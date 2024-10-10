@@ -1,0 +1,12 @@
+{
+  "root": [
+    "./src/index.ts",
+    "./src/controllers/task.controller.ts",
+    "./src/models/task.model.ts",
+    "./src/models/user.model.ts",
+    "./src/routes/index.route.ts",
+    "./src/routes/task.route.ts",
+    "./src/validators/task.validator.ts"
+  ],
+  "version": "5.6.2"
+}

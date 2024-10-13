@@ -1,0 +1,17 @@
+{
+  "name": "mern-todo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "install": "concurrently \"cd backend && npm install\" \"cd frontend && npm install\"",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "start": "npm run start --prefix backend",
+    "build": "concurrently \"cd backend && npm run build\" \"cd frontend && npm run build\""
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

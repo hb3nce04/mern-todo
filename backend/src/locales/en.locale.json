@@ -2,8 +2,9 @@
 	"auth": {
 		"USERNAME_EXISTS": "Username already exists",
 		"EMAIL_EXISTS": "Email already exists",
-		"INVALID_CREDENTIALS": "Invalid credentials",
-		"USER_CREATED": "User created successfully"
+		"USER_CREATED": "User created successfully",
+
+		"INVALID_CREDENTIALS": "Invalid username or password"
 	},
 	"other": {
 		"RESOURCE_NOT_FOUND": "The requested resource is not available."

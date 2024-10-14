@@ -24,3 +24,9 @@ export const registerUser = wrapperHelper(
 			.json({ message: _(req, "auth", createdUser.message) });
 	}
 );
+
+export const signInUser = wrapperHelper((req: Request, res: Response) => {
+	//console.log(res.user);
+
+	res.send("teszt");
+});

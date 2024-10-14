@@ -10,6 +10,8 @@ import rateLimit from "express-rate-limit";
 import errorHandler from "./middlewares/error-handler.middleware";
 import createHttpError from "http-errors";
 import { _ } from "./helpers/locale.helper";
+import passport from "passport";
+import { localStrategy } from "./configs/passport.config";
 
 const app = express();
 
@@ -29,6 +31,7 @@ app.use(
 );
 app.use(limiter);
 app.use(compression());
+passport.use(localStrategy);
 
 app.use("/api", routes);
 

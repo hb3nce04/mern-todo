@@ -29,7 +29,6 @@ export const createUser = async (
 	return { success: true, message: "USER_CREATED" };
 };
 
-// TODO - implementing
 export const loginUser = async (req: Request, res: Response) => {};
 export const logoutUser = async (req: Request, res: Response) => {};
 export const refreshToken = async (req: Request, res: Response) => {};

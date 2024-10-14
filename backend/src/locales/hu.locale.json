@@ -2,8 +2,9 @@
 	"auth": {
 		"USERNAME_EXISTS": "Felhasználó már létezik",
 		"EMAIL_EXISTS": "E-mail cím már létezik",
-		"INVALID_CREDENTIALS": "Hibás adatok",
-		"USER_CREATED": "Felhasználó sikeresen létrehozva"
+		"USER_CREATED": "Felhasználó sikeresen létrehozva",
+
+		"INVALID_CREDENTIALS": "Hibás felhasználónév vagy jelszó"
 	},
 	"other": {
 		"RESOURCE_NOT_FOUND": "Az kért erőforrás jelenleg nem található."

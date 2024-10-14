@@ -5,12 +5,10 @@ const authSchema = {
 	name: Joi.string().min(3).max(30).required(),
 	password: Joi.string().min(6).max(30).required(),
 };
-
 export const registerSchema = Joi.object({
 	...authSchema,
 	email: Joi.string().email().required(),
 });
-
 export const loginSchema = Joi.object(authSchema);
 
 // Task

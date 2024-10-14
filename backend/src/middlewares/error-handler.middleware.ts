@@ -8,18 +8,15 @@ export default (
 	res: Response,
 	next: NextFunction
 ) => {
-	res
-		.status(
-			err instanceof HttpError
-				? err.statusCode
-				: StatusCodes.INTERNAL_SERVER_ERROR
-		)
-		.json({
-			message:
-				err instanceof HttpError
-					? err.message
-					: ReasonPhrases.INTERNAL_SERVER_ERROR,
-		});
+	const code =
+		err instanceof HttpError
+			? err.statusCode
+			: StatusCodes.INTERNAL_SERVER_ERROR;
+	const message =
+		err instanceof HttpError
+			? err.message
+			: ReasonPhrases.INTERNAL_SERVER_ERROR;
+
 	if (!(err instanceof HttpError)) {
 		if (process.env.NODE_ENV === "development") {
 			console.error(err.stack);
@@ -27,4 +24,6 @@ export default (
 			console.error(`${err.name}: ${err.message}`);
 		}
 	}
+
+	res.status(code).json({ message });
 };

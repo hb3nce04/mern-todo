@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
-import { _ } from "../helpers/locale.helper";
+import { getLocalizedText } from "../helpers/locale.helper";
 import wrapperHelper from "../helpers/wrapper.helper";
-import { createUser } from "../services/auth.service";
+import { createUser, authUser } from "../services/auth.service";
 import { StatusCodes } from "http-status-codes";
 
 export const registerUser = wrapperHelper(
@@ -16,17 +16,31 @@ export const registerUser = wrapperHelper(
 		);
 
 		if (!createdUser.success) {
-			throw createHttpError.Conflict(_(req, "auth", createdUser.message));
+			throw createHttpError.Conflict(
+				getLocalizedText(req, "auth", createdUser.message)
+			);
 		}
 
 		res
 			.status(StatusCodes.CREATED)
-			.json({ message: _(req, "auth", createdUser.message) });
+			.json({ message: getLocalizedText(req, "auth", createdUser.message) });
 	}
 );
 
-export const signInUser = wrapperHelper((req: Request, res: Response) => {
-	//console.log(res.user);
+export const authenticateUser = wrapperHelper(
+	async (req: Request, res: Response, next: NextFunction) => {
+		const { name, password } = req.body;
 
-	res.send("teszt");
-});
+		const { success, message, token } = await authUser(name, password);
+
+		if (!success) {
+			throw createHttpError.Unauthorized(
+				getLocalizedText(req, "auth", message)
+			);
+		}
+
+		res
+			.status(StatusCodes.OK)
+			.json({ message: getLocalizedText(req, "auth", message), token });
+	}
+);

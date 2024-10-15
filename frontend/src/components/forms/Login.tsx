@@ -1,22 +1,26 @@
 import { Button, HR, Label, TextInput } from "flowbite-react";
 
 import { FaFacebook, FaGoogle } from "react-icons/fa";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
+import axios from "../../libs/axios";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/Auth";
 
 function Login({ changeForm }) {
 	const [isLoading, setIsLoading] = useState(false);
 
+	const { login } = useContext(AuthContext);
+
 	const formik = useFormik({
 		initialValues: {
-			email: "",
+			name: "",
 			password: "",
 		},
 		onSubmit: (values) => {
 			if (!isLoading) {
-				toast.success("Logged in successfully!");
-				setIsLoading(true);
+				login(values.name, values.password, setIsLoading);
 			}
 		},
 	});
@@ -30,15 +34,15 @@ function Login({ changeForm }) {
 				className="flex max-w flex-col gap-4"
 				onSubmit={formik.handleSubmit}
 			>
-				<Label htmlFor="email1" value="Your email" />
+				<Label htmlFor="name" value="Your username" />
 				<TextInput
-					id="email"
+					id="name"
 					type="text"
 					onChange={formik.handleChange}
 					value={formik.values.email}
 					required
 				/>
-				<Label htmlFor="email1" value="Your password" />
+				<Label htmlFor="password" value="Your password" />
 				<TextInput
 					id="password"
 					type="password"

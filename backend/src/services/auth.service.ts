@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { hash } from "bcrypt";
-import { _ } from "../helpers/locale.helper";
+import { compare, hash } from "bcrypt";
 import User from "../models/user.model";
+import { sign } from "jsonwebtoken";
 
 export const createUser = async (
 	name: string,
@@ -29,7 +29,34 @@ export const createUser = async (
 	return { success: true, message: "USER_CREATED" };
 };
 
-export const loginUser = async (req: Request, res: Response) => {};
+export const authUser = async (
+	name: string,
+	password: string
+): Promise<{ success: boolean; message: string; token?: string }> => {
+	const foundUser = await User.findOne({ name });
+
+	if (!foundUser) {
+		return { success: false, message: "INVALID_CREDENTIALS" };
+	}
+
+	const validPassword = await compare(
+		password + process.env.PASSWORD_SALT,
+		foundUser.password
+	);
+
+	if (!validPassword) {
+		return { success: false, message: "INVALID_CREDENTIALS" };
+	}
+
+	const token = sign(
+		{ id: foundUser.id, name: foundUser.name, email: foundUser.email },
+		process.env.JWT_SECRET || "",
+		{ expiresIn: process.env.JWT_LIFETIME }
+	);
+
+	return { success: true, message: "AUTHENTICATED", token };
+};
+
 export const logoutUser = async (req: Request, res: Response) => {};
 export const refreshToken = async (req: Request, res: Response) => {};
 export const verifyUser = async (req: Request, res: Response) => {};

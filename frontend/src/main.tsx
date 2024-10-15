@@ -8,6 +8,7 @@ import SignInPage from "./pages/SignIn.tsx";
 import MainPage from "./pages/Main.tsx";
 import { Toaster } from "react-hot-toast";
 import { DarkThemeToggle, Flowbite } from "flowbite-react";
+import { AuthProvider } from "./contexts/Auth.tsx";
 
 // https://www.behance.net/gallery/207897075/To-Do-List-Dashboard?tracking_source=search_projects|todo+list&l=1
 
@@ -30,9 +31,11 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
 		<Flowbite>
-			<DarkThemeToggle className="fixed bottom-5 right-5" />
-			<RouterProvider router={router} />
-			<Toaster position="bottom-right" />
+			<AuthProvider>
+				<DarkThemeToggle className="fixed bottom-5 right-5" />
+				<RouterProvider router={router} />
+				<Toaster position="bottom-right" />{" "}
+			</AuthProvider>
 		</Flowbite>
 	</StrictMode>
 );

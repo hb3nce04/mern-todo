@@ -9,9 +9,7 @@ import routes from "./routes/index.route";
 import rateLimit from "express-rate-limit";
 import errorHandler from "./middlewares/error-handler.middleware";
 import createHttpError from "http-errors";
-import { _ } from "./helpers/locale.helper";
-import passport from "passport";
-import { localStrategy } from "./configs/passport.config";
+import { getLocalizedText } from "./helpers/locale.helper";
 
 const app = express();
 
@@ -31,14 +29,13 @@ app.use(
 );
 app.use(limiter);
 app.use(compression());
-passport.use(localStrategy);
 
 app.use("/api", routes);
 
 app.get("*", (req: Request, res: Response, next) => {
 	throw createHttpError(
 		StatusCodes.NOT_FOUND,
-		_(req, "other", "RESOURCE_NOT_FOUND")
+		getLocalizedText(req, "other", "RESOURCE_NOT_FOUND")
 	);
 });
 

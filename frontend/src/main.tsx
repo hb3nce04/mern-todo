@@ -21,21 +21,24 @@ const router = createBrowserRouter([
 	{
 		path: "/signin",
 		element: <SignInPage />,
+		errorElement: <ErrorPage />,
 	},
 	{
 		path: "/home",
 		element: <MainPage />,
+		errorElement: <ErrorPage />,
 	},
 ]);
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
 		<Flowbite>
-			<AuthProvider>
-				<DarkThemeToggle className="fixed bottom-5 right-5" />
-				<RouterProvider router={router} />
-				<Toaster position="bottom-right" />{" "}
-			</AuthProvider>
+			<RouterProvider router={router}>
+				<AuthProvider>
+					<DarkThemeToggle className="fixed bottom-5 right-5" />
+					<Toaster position="bottom-right" />{" "}
+				</AuthProvider>
+			</RouterProvider>
 		</Flowbite>
 	</StrictMode>
 );

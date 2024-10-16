@@ -3,18 +3,25 @@ import axios from "../libs/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-export const AuthContext = createContext(null);
+interface AuthContextType {
+	login: (
+		name: string,
+		password: string,
+		loading: (isLoading: boolean) => void
+	) => void;
+	logout: () => void;
+}
 
-export const AuthProvider = ({ children }) => {
-	const [user, setUser] = useState(null);
-	const navigate = useNavigate();
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+	const [user, setUser] = useState(false);
+	//const navigate = useNavigate();
 
 	useEffect(() => {
 		const savedUser = localStorage.getItem("user");
 		if (savedUser) {
 			setUser(JSON.parse(savedUser));
 		}
-	}, [localStorage.getItem("user")]);
+	}, []);
 
 	const login = (name: string, password: string, loading: any) => {
 		loading(true);
@@ -23,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 			.then((res) => {
 				localStorage.setItem("token", res.data.token);
 				toast.success(res.data.message);
-				navigate.push("/home");
+				//navigate.push("/home");
 				loading(false);
 			})
 			.catch((err) => {
@@ -38,6 +45,12 @@ export const AuthProvider = ({ children }) => {
 	};
 
 	return (
-		<AuthContext.Provider value={{ login }}>{children}</AuthContext.Provider>
+		<AuthContext.Provider value={{ login, logout }}>
+			{children}
+		</AuthContext.Provider>
 	);
 };
+
+export const AuthContext = createContext<AuthContextType | undefined>(
+	undefined
+);

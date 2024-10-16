@@ -1,36 +1,34 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import createHttpError from "http-errors";
-import User from "../models/user.model";
 import wrapperHelper from "../helpers/wrapper.helper";
 import { JwtPayload, verify } from "jsonwebtoken";
-import { Types } from "mongoose";
+import { UserRequest } from "../types/user-request.interface";
 
 export default wrapperHelper(
-	async (req: Request, res: Response, next: NextFunction) => {
-		const { authorization } = req.headers;
-		const token = authorization?.split(" ")[1];
+	async (req: UserRequest, res: Response, next: NextFunction) => {
+		const cookie = req.cookies.token;
 
-		if (!authorization || !token) {
-			return next(createHttpError.Unauthorized());
+		if (!cookie) {
+			throw createHttpError.Unauthorized("Token not found");
 		}
 
-		const payload = (await verify(
-			token,
+		const decoded = (await verify(
+			cookie,
 			process.env.JWT_SECRET || ""
 		)) as JwtPayload;
-		if (!payload) {
+		if (!decoded) {
 			throw createHttpError.Unauthorized("Invalid token");
 		}
 
-		const user = await User.findById({
-			_id: payload.id,
-			name: payload.name,
-			email: payload.email,
-		});
-		if (!user) {
-			return next(createHttpError.Unauthorized("User not found"));
-		}
+		// TODO + WITH CACHING
+		// const user = await User.findById({
+		// 	_id: decoded.id,
+		// });
+		// if (!user) {
+		// 	throw createHttpError.Unauthorized("User not found");
+		// }
 
+		req.user = decoded;
 		next();
 	}
 );

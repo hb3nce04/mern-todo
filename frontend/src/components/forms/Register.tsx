@@ -1,18 +1,35 @@
 import { Card, Button, Label, TextInput } from "flowbite-react";
 
+import * as yup from "yup";
 import { useState } from "react";
 import { useFormik } from "formik";
+
+const validationSchema = yup.object({
+	email: yup
+		.string()
+		.email("Hibás e-mail cím")
+		.required("E-mail cím megadása kötelező"),
+	password: yup
+		.string()
+		.min(6, "A jelszónak legalább 6 karakter hosszúnak kell lennie")
+		.required("Jelszó megadása kötelező"),
+	password2: yup
+		.string()
+		.min(6, "A jelszónak legalább 6 karakter hosszúnak kell lennie")
+		.oneOf([yup.ref("password"), null], "A jelszavaknak egyezniük kell")
+		.required("Jelszó megadása kötelező"),
+});
 
 function Register({ changeForm }) {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const formik = useFormik({
 		initialValues: {
-			username: "",
 			email: "",
 			password: "",
 			password2: "",
 		},
+		validationSchema: validationSchema,
 		onSubmit: (values) => {
 			setIsLoading(true);
 		},
@@ -27,21 +44,21 @@ function Register({ changeForm }) {
 				className="flex max-w flex-col gap-4"
 				onSubmit={formik.handleSubmit}
 			>
-				<Label htmlFor="username" value="Username" />
-				<TextInput
-					id="username"
-					type="text"
-					onChange={formik.handleChange}
-					value={formik.values.username}
-					required
-				/>
 				<Label htmlFor="email1" value="Email address" />
 				<TextInput
 					id="email"
-					type="text"
+					type="email"
 					onChange={formik.handleChange}
 					value={formik.values.email}
 					required
+					color={formik.errors.email ? "red" : "success"}
+					helperText={
+						formik.errors.email && (
+							<>
+								<span className="font-small">{formik.errors.email}</span>{" "}
+							</>
+						)
+					}
 				/>
 				<Label htmlFor="password" value="Password" />
 				<TextInput
@@ -50,6 +67,14 @@ function Register({ changeForm }) {
 					required
 					onChange={formik.handleChange}
 					value={formik.values.password}
+					color={formik.errors.password ? "red" : "success"}
+					helperText={
+						formik.errors.password && (
+							<>
+								<span className="font-small">{formik.errors.password}</span>{" "}
+							</>
+						)
+					}
 				/>
 				<Label htmlFor="password2" value="Password confirmation" />
 				<TextInput
@@ -58,6 +83,14 @@ function Register({ changeForm }) {
 					required
 					onChange={formik.handleChange}
 					value={formik.values.password2}
+					color={formik.errors.password2 ? "red" : "success"}
+					helperText={
+						formik.errors.password2 && (
+							<>
+								<span className="font-small">{formik.errors.password2}</span>{" "}
+							</>
+						)
+					}
 				/>
 				<Button color="blue" fullSized isProcessing={isLoading} type="submit">
 					Register

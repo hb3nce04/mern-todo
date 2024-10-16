@@ -11,16 +11,16 @@ import { AuthContext } from "../../contexts/Auth";
 function Login({ changeForm }) {
 	const [isLoading, setIsLoading] = useState(false);
 
-	const { login } = useContext(AuthContext);
+	//const { login, logout } = useContext(AuthContext);
 
 	const formik = useFormik({
 		initialValues: {
-			name: "",
+			email: "",
 			password: "",
 		},
 		onSubmit: (values) => {
 			if (!isLoading) {
-				login(values.name, values.password, setIsLoading);
+				//login(values.email, values.password, setIsLoading);
 			}
 		},
 	});
@@ -34,10 +34,10 @@ function Login({ changeForm }) {
 				className="flex max-w flex-col gap-4"
 				onSubmit={formik.handleSubmit}
 			>
-				<Label htmlFor="name" value="Your username" />
+				<Label htmlFor="name" value="Your email" />
 				<TextInput
 					id="name"
-					type="text"
+					type="email"
 					onChange={formik.handleChange}
 					value={formik.values.email}
 					required

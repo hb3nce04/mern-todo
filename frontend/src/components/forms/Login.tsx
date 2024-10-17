@@ -9,7 +9,19 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/Auth";
 
 function Login({ changeForm }) {
-	const [isLoading, setIsLoading] = useState(false);
+	const [buttonState, setButtonState] = useState({});
+	const navigate = useNavigate();
+
+	const handleButton = (id, state) => {
+		setButtonState({
+			...buttonState,
+			[id]: state,
+		});
+	};
+
+	const isLoading = (id) => {
+		return buttonState[id] || false;
+	};
 
 	//const { login, logout } = useContext(AuthContext);
 
@@ -19,11 +31,21 @@ function Login({ changeForm }) {
 			password: "",
 		},
 		onSubmit: (values) => {
-			if (!isLoading) {
+			if (!isLoading("login")) {
+				handleButton("login", true);
 				//login(values.email, values.password, setIsLoading);
 			}
 		},
 	});
+
+	const handleGoogleAuth = async () => {
+		if (!isLoading("google")) {
+			handleButton("google", true);
+			await axios.get("http://localhost:3000/api/auth/google").then((res) => {
+				window.open(res.data.url, "_target");
+			});
+		}
+	};
 
 	return (
 		<>
@@ -50,7 +72,12 @@ function Login({ changeForm }) {
 					onChange={formik.handleChange}
 					value={formik.values.password}
 				/>
-				<Button color="blue" fullSized isProcessing={isLoading} type="submit">
+				<Button
+					color="blue"
+					fullSized
+					isProcessing={isLoading("login")}
+					type="submit"
+				>
 					Log in
 				</Button>
 				<Button color="light" fullSized onClick={changeForm}>
@@ -62,7 +89,12 @@ function Login({ changeForm }) {
 						text: "dark:bg-gray-800 bg-slate-300 p-2 left-50",
 					}}
 				/>
-				<Button color="blue" fullSized>
+				<Button
+					color="blue"
+					fullSized
+					isProcessing={isLoading("google")}
+					onClick={handleGoogleAuth}
+				>
 					<FaGoogle className="my-auto mx-2 text-xl" />
 					Sign in with Google
 				</Button>

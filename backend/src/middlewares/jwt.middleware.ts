@@ -2,7 +2,7 @@ import { Response, NextFunction } from "express";
 import createHttpError from "http-errors";
 import wrapperHelper from "../helpers/wrapper.helper";
 import { JwtPayload, verify } from "jsonwebtoken";
-import { UserRequest } from "../types/user-request.interface";
+import { UserRequest } from "../types/user.request.interface";
 
 export default wrapperHelper(
 	async (req: UserRequest, res: Response, next: NextFunction) => {

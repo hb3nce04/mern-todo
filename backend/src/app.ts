@@ -7,7 +7,7 @@ import compression from "compression";
 import helmet from "helmet";
 import routes from "./routes/index.route";
 import rateLimit from "express-rate-limit";
-import errorHandler from "./middlewares/error.handler.middleware";
+import { errorHandler } from "./middlewares/error.handler.middleware";
 import createHttpError from "http-errors";
 
 const app = express();
@@ -31,10 +31,8 @@ app.use(limiter);
 
 app.use("/api", routes);
 
-app.get("*", () => {
-	throw createHttpError.NotFound(
-		"The requested resource currently is not available"
-	);
+app.use(() => {
+	throw createHttpError.NotFound("Resource not found");
 });
 
 app.use(errorHandler);

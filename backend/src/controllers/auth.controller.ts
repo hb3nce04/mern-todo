@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
-import wrapperHelper from "../helpers/wrapper.helper";
+import { wrapperHelper } from "../helpers/wrapper.helper";
 import { StatusCodes } from "http-status-codes";
 import User from "../models/user.model";
-import { compare, hash } from "bcrypt";
-import { sign } from "jsonwebtoken";
+import { compare } from "bcrypt";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
+import { jwtTokenCookieOptions } from "../utils/cookie.util";
+import { createJWTToken } from "../utils/jwt.util";
 
 const client = new OAuth2Client(
 	process.env.GOOGLE_CLIENT_ID,
@@ -13,31 +14,7 @@ const client = new OAuth2Client(
 	"http://localhost:3000/api/auth/google/callback"
 );
 
-export const registerUser = wrapperHelper(
-	async (req: Request, res: Response) => {
-		const { email, password } = req.body;
-
-		const existingUserByEmail = await User.findOne({ email });
-		if (existingUserByEmail) {
-			throw createHttpError.Conflict(
-				"Email already exists. Please use another email"
-			);
-		}
-
-		const hashedPassword = await hash(password + process.env.PASSWORD_SALT, 12);
-
-		await User.create({
-			email,
-			password: hashedPassword,
-		});
-
-		res
-			.status(StatusCodes.CREATED)
-			.json({ message: "Successfully registered" });
-	}
-);
-
-export const authenticateUser = wrapperHelper(
+export const handleLocalAuth = wrapperHelper(
 	async (req: Request, res: Response) => {
 		const { email, password } = req.body;
 
@@ -51,7 +28,7 @@ export const authenticateUser = wrapperHelper(
 
 		const isPasswordValid = await compare(
 			password + process.env.PASSWORD_SALT,
-			existingUser.password
+			existingUser.password!
 		);
 
 		if (!isPasswordValid) {
@@ -60,18 +37,11 @@ export const authenticateUser = wrapperHelper(
 			);
 		}
 
-		const token = sign({ id: existingUser.id }, process.env.JWT_SECRET || "", {
-			expiresIn: process.env.JWT_LIFETIME,
-		});
+		const token = createJWTToken(existingUser);
 
 		// TODO
 		res
-			.cookie("token", token, {
-				maxAge: parseInt(process.env.COOKIE_MAX_AGE || "0"),
-				httpOnly: true,
-				secure: process.env.NODE_ENV === "production",
-				sameSite: "strict",
-			})
+			.cookie("token", token, jwtTokenCookieOptions)
 			.status(StatusCodes.OK)
 			.json({
 				message: "Logged in successfully",
@@ -84,8 +54,8 @@ export const handleGoogleAuth = wrapperHelper(
 	async (req: Request, res: Response) => {
 		const authorizationUrl = client.generateAuthUrl({
 			access_type: "offline",
-			scope: ["profile", "email"], // "email"?
-			state: "your_state_value", // Optional state parameter for CSRF protection
+			scope: ["profile"],
+			state: "MYCSRFPROTECTION",
 			prompt: "select_account",
 		});
 
@@ -118,41 +88,41 @@ export const handleGoogleCallback = wrapperHelper(
 			throw createHttpError.Unauthorized("Invalid ticket");
 		}
 
-		const payload = ticket.getPayload();
+		const payload = ticket.getPayload() as TokenPayload;
 
-		res.send("<h1>Successful login!</h1>");
+		// TODO: merging problem - that's why we don't save user's gmail
+		const existingUser = await User.findOne({ googleId: payload.sub });
 
-		// const user = await User.findOne({ googleId });
+		let token;
+		let user = existingUser;
+		if (!existingUser) {
+			const createdUser = await User.create({
+				googleId: payload.sub,
+				name: payload.name,
+				picture: payload.picture,
+			});
+			token = createJWTToken(createdUser);
+			user = createdUser;
+		} else {
+			token = createJWTToken(existingUser);
+		}
 
-		// if (!user) {
-		// }
+		res
+			.cookie("token", token, jwtTokenCookieOptions)
+			.status(StatusCodes.OK)
+			.json({
+				message: "Logged in successfully",
+				user: { id: user!.id, email: user!.email },
+			});
 	}
 );
 
-// export const logoutUser = async (req: Request, res: Response) => {};
+export const handleLogout = (req: Request, res: Response) => {
+	res
+		.clearCookie("token")
+		.status(StatusCodes.OK)
+		.json({ message: "Logged out successfully" });
+};
+
 // export const refreshToken = async (req: Request, res: Response) => {};
 // export const verifyUser = async (req: Request, res: Response) => {};
-// export const forgotPassword = async (req: Request, res: Response) => {};
-// export const resetPassword = async (req: Request, res: Response) => {};
-// export const changePassword = async (req: Request, res: Response) => {};
-// export const changeEmail = async (req: Request, res: Response) => {};
-// export const deleteUser = async (req: Request, res: Response) => {};
-// export const getUser = async (req: Request, res: Response) => {};
-// export const getUsers = async (req: Request, res: Response) => {};
-// export const updateUser = async (req: Request, res: Response) => {};
-// export const updateMe = async (req: Request, res: Response) => {};
-// export const deleteMe = async (req: Request, res: Response) => {};
-// export const getMe = async (req: Request, res: Response) => {};
-// export const uploadAvatar = async (req: Request, res: Response) => {};
-// export const deleteAvatar = async (req: Request, res: Response) => {};
-// export const verifyEmail = async (req: Request, res: Response) => {};
-// export const resendVerificationEmail = async (
-// 	req: Request,
-// 	res: Response
-// ) => {};
-// export const sendPasswordResetEmail = async (req: Request, res: Response) => {};
-// export const sendEmailChangeEmail = async (req: Request, res: Response) => {};
-// export const sendEmailChangeVerificationEmail = async (
-// 	req: Request,
-// 	res: Response
-// ) => {};

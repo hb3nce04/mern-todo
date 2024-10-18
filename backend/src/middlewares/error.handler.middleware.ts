@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 
-export default (
+export const errorHandler = (
 	err: HttpError | Error,
 	req: Request,
 	res: Response,

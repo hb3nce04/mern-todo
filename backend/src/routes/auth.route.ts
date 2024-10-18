@@ -1,21 +1,31 @@
 import {
-	registerUser,
-	authenticateUser,
+	handleLocalAuth,
+	handleLogout,
 	handleGoogleAuth,
 	handleGoogleCallback,
 } from "../controllers/auth.controller";
-import { loginSchema, registerSchema } from "../utils/validation.util";
-import validationMiddleware from "../middlewares/validation.middleware";
+import { loginSchema } from "../utils/validation.util";
+import { validationMiddleware } from "../middlewares/validation.middleware";
 import { Router } from "express";
+import {
+	verifyJwtToken,
+	verifyNotJwtToken,
+} from "../middlewares/jwt.middleware";
 
 const router = Router();
 
 // Local Auth
-router.post("/register", validationMiddleware(registerSchema), registerUser);
-router.post("/login", validationMiddleware(loginSchema), authenticateUser);
+router.post(
+	"/local",
+	verifyNotJwtToken,
+	validationMiddleware(loginSchema),
+	handleLocalAuth
+);
 
 // Google OAuth
-router.get("/google", handleGoogleAuth);
-router.get("/google/callback", handleGoogleCallback);
+router.get("/google", verifyNotJwtToken, handleGoogleAuth);
+router.get("/google/callback", verifyNotJwtToken, handleGoogleCallback);
+
+router.post("/logout", verifyJwtToken, handleLogout);
 
 export default router;

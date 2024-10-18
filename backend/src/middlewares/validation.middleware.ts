@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import wrapperHelper from "../helpers/wrapper.helper";
+import { wrapperHelper } from "../helpers/wrapper.helper";
 import createHttpError from "http-errors";
 import Joi from "joi";
 
-export default (schema: Joi.Schema) => {
+export const validationMiddleware = (schema: Joi.Schema) => {
 	return wrapperHelper(
 		async (req: Request, res: Response, next: NextFunction) => {
 			await schema

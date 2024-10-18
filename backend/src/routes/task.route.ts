@@ -7,8 +7,8 @@ import {
 	deleteUserTask,
 	updateUserTask,
 } from "../controllers/task.controller";
-import verifyJwtToken from "../middlewares/jwt.middleware";
-import validationMiddleware from "../middlewares/validation.middleware";
+import { verifyJwtToken } from "../middlewares/jwt.middleware";
+import { validationMiddleware } from "../middlewares/validation.middleware";
 import { taskSchema } from "../utils/validation.util";
 
 const router = express.Router();

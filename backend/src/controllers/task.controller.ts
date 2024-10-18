@@ -1,5 +1,5 @@
 import { Response } from "express";
-import wrapperHelper from "../helpers/wrapper.helper";
+import { wrapperHelper } from "../helpers/wrapper.helper";
 import { StatusCodes } from "http-status-codes";
 import { isValidObjectId, Types } from "mongoose";
 import Task from "../models/task.model";

@@ -1,16 +1,81 @@
-import { Schema, model } from "mongoose";
+import { compare, hash } from "bcrypt";
+import { Model, Schema, model } from "mongoose";
 
-const userSchema = new Schema(
+interface IUser {
+	methods: string[];
+	local?: {
+		email: string;
+		password: string;
+	};
+	google?: {
+		id: string;
+		email: string;
+	};
+	name: string;
+	picture: string;
+}
+interface IUserMethods {
+	isValidPassword(password: string): Promise<boolean>;
+}
+type UserModel = Model<IUser, object, IUserMethods>;
+
+const schema = new Schema<IUser, UserModel, IUserMethods>(
 	{
-		email: { type: String, unique: true },
-		password: { type: String },
-		googleId: { type: String, unique: true },
+		methods: {
+			type: [String],
+			enum: ["local", "google"],
+			default: ["local"],
+			required: true,
+		},
+		local: {
+			email: {
+				type: String,
+				lowercase: true,
+			},
+			password: {
+				type: String,
+			},
+		},
+		google: {
+			id: {
+				type: String,
+			},
+			email: {
+				type: String,
+				lowercase: true,
+			},
+		},
 		name: { type: String },
 		picture: { type: String },
 	},
 	{ timestamps: true }
 );
 
-const User = model("User", userSchema);
+schema.methods.isValidPassword = async function (password: string) {
+	if (this.methods.includes("local")) {
+		return await compare(
+			password + process.env.PASSWORD_SALT,
+			this.local!.password
+		);
+	}
+	return false;
+};
+
+schema.pre("save", async function (next) {
+	if (!this.methods.includes("local")) {
+		next();
+	}
+	if (!this.isModified("local.password")) {
+		next();
+	}
+	const hashedPassword = await hash(
+		this.local!.password + process.env.PASSWORD_SALT,
+		12
+	);
+	this.local!.password = hashedPassword;
+	next();
+});
+
+const User = model<IUser, UserModel>("User", schema);
 
 export default User;

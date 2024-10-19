@@ -3,6 +3,7 @@ import createHttpError from "http-errors";
 import { wrapperHelper } from "../helpers/wrapper.helper";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { UserRequest } from "../types/user.request.interface";
+import User from "../models/user.model";
 
 export const verifyJwtToken = wrapperHelper(
 	async (req: UserRequest, res: Response, next: NextFunction) => {
@@ -21,14 +22,14 @@ export const verifyJwtToken = wrapperHelper(
 		}
 
 		// TODO + WITH CACHING
-		// const user = await User.findById({
-		// 	_id: decoded.id,
-		// });
-		// if (!user) {
-		// 	throw createHttpError.Unauthorized("User not found");
-		// }
-		console.log(decoded);
-		req.user = decoded;
+		const user = await User.findById({
+			_id: decoded.id,
+		});
+		if (!user) {
+			throw createHttpError.Unauthorized("User not found");
+		}
+
+		req.user = user;
 		next();
 	}
 );

@@ -3,7 +3,6 @@ import createHttpError from "http-errors";
 import { wrapperHelper } from "../helpers/wrapper.helper";
 import { StatusCodes } from "http-status-codes";
 import User from "../models/user.model";
-import { compare } from "bcrypt";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { jwtTokenCookieOptions } from "../utils/cookie.util";
 import { createJWTToken } from "../utils/jwt.util";
@@ -18,7 +17,7 @@ export const handleLocalAuth = wrapperHelper(
 	async (req: Request, res: Response) => {
 		const { email, password } = req.body;
 
-		const existingUser = await User.findOne({ email });
+		const existingUser = await User.findOne({ "local.email": email });
 
 		if (!existingUser) {
 			throw createHttpError.Unauthorized(
@@ -26,10 +25,7 @@ export const handleLocalAuth = wrapperHelper(
 			);
 		}
 
-		const isPasswordValid = await compare(
-			password + process.env.PASSWORD_SALT,
-			existingUser.password!
-		);
+		const isPasswordValid = await existingUser.isValidPassword(password);
 
 		if (!isPasswordValid) {
 			throw createHttpError.Unauthorized(
@@ -37,15 +33,12 @@ export const handleLocalAuth = wrapperHelper(
 			);
 		}
 
-		const token = createJWTToken(existingUser);
-
-		// TODO
 		res
-			.cookie("token", token, jwtTokenCookieOptions)
+			.cookie("token", createJWTToken(existingUser), jwtTokenCookieOptions)
 			.status(StatusCodes.OK)
 			.json({
 				message: "Logged in successfully",
-				user: { id: existingUser.id, email: existingUser.email },
+				user: { id: existingUser.id, email: existingUser.local!.email },
 			});
 	}
 );
@@ -54,7 +47,7 @@ export const handleGoogleAuth = wrapperHelper(
 	async (req: Request, res: Response) => {
 		const authorizationUrl = client.generateAuthUrl({
 			access_type: "offline",
-			scope: ["profile"],
+			scope: ["profile", "email"],
 			state: "MYCSRFPROTECTION",
 			prompt: "select_account",
 		});
@@ -90,29 +83,36 @@ export const handleGoogleCallback = wrapperHelper(
 
 		const payload = ticket.getPayload() as TokenPayload;
 
-		// TODO: merging problem - that's why we don't save user's gmail
-		const existingUser = await User.findOne({ googleId: payload.sub });
+		let existingUser = await User.findOne({ "google.id": payload.sub });
 
-		let token;
-		let user = existingUser;
 		if (!existingUser) {
-			const createdUser = await User.create({
-				googleId: payload.sub,
-				name: payload.name,
-				picture: payload.picture,
+			existingUser = await User.findOne({
+				"local.email": payload.email,
 			});
-			token = createJWTToken(createdUser);
-			user = createdUser;
-		} else {
-			token = createJWTToken(existingUser);
+			if (existingUser) {
+				existingUser.methods.push("google");
+				existingUser.google = {
+					id: payload.sub,
+					email: payload.email!,
+				};
+				await existingUser.save();
+			} else {
+				existingUser = await User.create({
+					methods: ["google"],
+					google: {
+						id: payload.sub,
+						email: payload.email!,
+					},
+				});
+			}
 		}
 
 		res
-			.cookie("token", token, jwtTokenCookieOptions)
+			.cookie("token", createJWTToken(existingUser), jwtTokenCookieOptions)
 			.status(StatusCodes.OK)
 			.json({
 				message: "Logged in successfully",
-				user: { id: user!.id, email: user!.email },
+				user: { id: existingUser.id, email: existingUser.google!.email },
 			});
 	}
 );

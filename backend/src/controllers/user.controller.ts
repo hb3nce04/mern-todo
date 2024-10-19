@@ -1,29 +1,55 @@
 import createHttpError from "http-errors";
 import { wrapperHelper } from "../helpers/wrapper.helper";
-import { hash } from "bcrypt";
 import User from "../models/user.model";
 import { StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
 
-export const createUser = wrapperHelper(async (req: Request, res: Response) => {
-	const { email, password } = req.body;
+interface CreateUserRequest extends Request {
+	body: {
+		email: string;
+		password: string;
+	};
+}
 
-	const existingUserByEmail = await User.findOne({ email });
-	if (existingUserByEmail) {
-		throw createHttpError.Conflict(
-			"Email already exists. Please use another email"
-		);
+export const createUser = wrapperHelper(
+	async (req: CreateUserRequest, res: Response) => {
+		const { email, password } = req.body;
+
+		const existingUser = await User.findOne({
+			$or: [{ "local.email": email }, { "google.email": email }],
+		});
+		if (existingUser) {
+			if (existingUser.methods.includes("local")) {
+				throw createHttpError.Conflict(
+					"Email already exists. Please use another email"
+				);
+			} else {
+				existingUser.methods.push("local");
+				existingUser.local = {
+					email,
+					password,
+				};
+				await existingUser.save();
+				res.status(StatusCodes.CREATED).json({
+					message:
+						"We've found a Google account with that e-mail address. Successfully registered and merged!",
+				});
+			}
+		} else {
+			await User.create({
+				methods: ["local"],
+				local: {
+					email,
+					password,
+				},
+			});
+
+			res
+				.status(StatusCodes.CREATED)
+				.json({ message: "Successfully registered" });
+		}
 	}
-
-	const hashedPassword = await hash(password + process.env.PASSWORD_SALT, 12);
-
-	await User.create({
-		email,
-		password: hashedPassword,
-	});
-
-	res.status(StatusCodes.CREATED).json({ message: "Successfully registered" });
-});
+);
 
 // export const forgotPassword = async (req: Request, res: Response) => {};
 // export const resetPassword = async (req: Request, res: Response) => {};

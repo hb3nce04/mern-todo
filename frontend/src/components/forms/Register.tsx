@@ -41,7 +41,7 @@ function Register({ changeForm }) {
 				Create an <span className="text-primary-500">account</span>
 			</h1>
 			<form
-				className="flex max-w flex-col gap-4"
+				className="flex max-w flex-col gap-2"
 				onSubmit={formik.handleSubmit}
 			>
 				<Label htmlFor="email1" value="Email address" />
@@ -51,11 +51,13 @@ function Register({ changeForm }) {
 					onChange={formik.handleChange}
 					value={formik.values.email}
 					required
-					color={formik.errors.email ? "red" : "success"}
+					color={
+						formik.errors.email ? "red" : formik.touched.email ? "success" : ""
+					}
 					helperText={
 						formik.errors.email && (
 							<>
-								<span className="font-small">{formik.errors.email}</span>{" "}
+								<span className="font-small p-0">{formik.errors.email}</span>{" "}
 							</>
 						)
 					}

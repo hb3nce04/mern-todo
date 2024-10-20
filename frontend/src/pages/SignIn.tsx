@@ -12,7 +12,7 @@ function SignIn() {
 
 	return (
 		<div className="min-h-screen dark:bg-gradient-to-t from-slate-900 to-slate-800 bg-slate-300 flex justify-center items-center ">
-			<Card className="bg-slate-300 shadow-2xl rounded-xl border-none">
+			<Card className="bg-slate-300 shadow-2xl rounded-xl border-none w-full max-w-xs h-full max-h-lg">
 				{login ? (
 					<LoginForm changeForm={changeForm} />
 				) : (

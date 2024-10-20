@@ -1,7 +1,7 @@
 import { compare, hash } from "bcrypt";
 import { Model, Schema, model } from "mongoose";
 
-interface IUser {
+export interface IUser {
 	methods: string[];
 	local?: {
 		email: string;

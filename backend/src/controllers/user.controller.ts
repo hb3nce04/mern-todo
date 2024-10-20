@@ -1,8 +1,11 @@
 import createHttpError from "http-errors";
 import { wrapperHelper } from "../helpers/wrapper.helper";
-import User from "../models/user.model";
 import { StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
+import {
+	findUserByEmail,
+	createUser as createUserService,
+} from "../services/user.service";
 
 interface CreateUserRequest extends Request {
 	body: {
@@ -15,9 +18,7 @@ export const createUser = wrapperHelper(
 	async (req: CreateUserRequest, res: Response) => {
 		const { email, password } = req.body;
 
-		const existingUser = await User.findOne({
-			$or: [{ "local.email": email }, { "google.email": email }],
-		});
+		const existingUser = await findUserByEmail(email);
 		if (existingUser) {
 			if (existingUser.methods.includes("local")) {
 				throw createHttpError.Conflict(
@@ -36,13 +37,7 @@ export const createUser = wrapperHelper(
 				});
 			}
 		} else {
-			await User.create({
-				methods: ["local"],
-				local: {
-					email,
-					password,
-				},
-			});
+			await createUserService(email, password);
 
 			res
 				.status(StatusCodes.CREATED)

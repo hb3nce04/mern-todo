@@ -6,6 +6,10 @@ import User from "../models/user.model";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { jwtTokenCookieOptions } from "../utils/cookie.util";
 import { createJWTToken } from "../utils/jwt.util";
+import {
+	findUserByGoogleId,
+	findUserByLocalEmail,
+} from "../services/user.service";
 
 const client = new OAuth2Client(
 	process.env.GOOGLE_CLIENT_ID,
@@ -17,20 +21,16 @@ export const handleLocalAuth = wrapperHelper(
 	async (req: Request, res: Response) => {
 		const { email, password } = req.body;
 
-		const existingUser = await User.findOne({ "local.email": email });
+		const existingUser = await findUserByLocalEmail(email);
 
 		if (!existingUser) {
-			throw createHttpError.Unauthorized(
-				"Unauthorized access. Please check your credentials"
-			);
+			throw createHttpError.Unauthorized("Invalid credentials!");
 		}
 
 		const isPasswordValid = await existingUser.isValidPassword(password);
 
 		if (!isPasswordValid) {
-			throw createHttpError.Unauthorized(
-				"Unauthorized access. Please check your credentials"
-			);
+			throw createHttpError.Unauthorized("Invalid credentials!");
 		}
 
 		res
@@ -38,7 +38,7 @@ export const handleLocalAuth = wrapperHelper(
 			.status(StatusCodes.OK)
 			.json({
 				message: "Logged in successfully",
-				user: { id: existingUser.id, email: existingUser.local!.email },
+				user: { id: existingUser.id, email: existingUser.local!.email }, // TODO
 			});
 	}
 );
@@ -81,27 +81,27 @@ export const handleGoogleCallback = wrapperHelper(
 			throw createHttpError.Unauthorized("Invalid ticket");
 		}
 
-		const payload = ticket.getPayload() as TokenPayload;
+		const { sub: googleId, email } = ticket.getPayload() as TokenPayload;
 
-		let existingUser = await User.findOne({ "google.id": payload.sub });
+		let existingUser = await findUserByGoogleId(googleId);
 
 		if (!existingUser) {
 			existingUser = await User.findOne({
-				"local.email": payload.email,
+				"local.email": email,
 			});
 			if (existingUser) {
 				existingUser.methods.push("google");
 				existingUser.google = {
-					id: payload.sub,
-					email: payload.email!,
+					id: googleId,
+					email: email!,
 				};
 				await existingUser.save();
 			} else {
 				existingUser = await User.create({
 					methods: ["google"],
 					google: {
-						id: payload.sub,
-						email: payload.email!,
+						id: googleId,
+						email: email!,
 					},
 				});
 			}
@@ -109,11 +109,8 @@ export const handleGoogleCallback = wrapperHelper(
 
 		res
 			.cookie("token", createJWTToken(existingUser), jwtTokenCookieOptions)
-			.status(StatusCodes.OK)
-			.json({
-				message: "Logged in successfully",
-				user: { id: existingUser.id, email: existingUser.google!.email },
-			});
+			.status(StatusCodes.SEE_OTHER)
+			.send("Login successful! You can close this tab now.");
 	}
 );
 

@@ -1,6 +1,6 @@
 import { Button, HR, Label, TextInput } from "flowbite-react";
 
-import { FaFacebook, FaGoogle } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import { useContext, useState } from "react";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
@@ -97,10 +97,6 @@ function Login({ changeForm }) {
 				>
 					<FaGoogle className="my-auto mx-2 text-xl" />
 					Sign in with Google
-				</Button>
-				<Button color="blue" fullSized>
-					<FaFacebook className="my-auto mx-2 text-xl" />
-					Sign in with Facebook
 				</Button>
 			</form>
 		</>

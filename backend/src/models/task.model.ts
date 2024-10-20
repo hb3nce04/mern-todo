@@ -1,6 +1,15 @@
 import { Schema, model } from "mongoose";
 
-const taskSchema = new Schema(
+export interface ITask {
+	userId: string; // TODO: Types.ObjectId???
+	priority: "low" | "medium" | "high";
+	title: string;
+	description?: string;
+	completed?: boolean | false;
+	dueDate: Date;
+}
+
+const schema = new Schema(
 	{
 		userId: {
 			type: Schema.Types.ObjectId,
@@ -20,6 +29,6 @@ const taskSchema = new Schema(
 	{ timestamps: true }
 );
 
-const Task = model("Task", taskSchema);
+const Task = model("Task", schema);
 
 export default Task;

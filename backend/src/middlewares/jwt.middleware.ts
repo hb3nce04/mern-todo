@@ -15,7 +15,7 @@ export const verifyJwtToken = wrapperHelper(
 
 		const decoded = (await verify(
 			cookie,
-			process.env.JWT_SECRET || ""
+			process.env.JWT_SECRET ?? ""
 		)) as JwtPayload;
 		if (!decoded) {
 			throw createHttpError.Unauthorized("Invalid token");
@@ -29,6 +29,7 @@ export const verifyJwtToken = wrapperHelper(
 			throw createHttpError.Unauthorized("User not found");
 		}
 
+		// TODO: return with the necceassry user data
 		req.user = user;
 		next();
 	}
@@ -38,6 +39,7 @@ export const verifyNotJwtToken = wrapperHelper(
 	async (req: UserRequest, res: Response, next: NextFunction) => {
 		const cookie = req.cookies.token;
 
+		// TODO: maybe we should check whether the token is valid or not
 		if (cookie) {
 			throw createHttpError.Forbidden("You've already authorized!");
 		}

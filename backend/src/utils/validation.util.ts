@@ -14,4 +14,5 @@ export const taskSchema = Joi.object({
 	title: Joi.string().required(),
 	description: Joi.string(),
 	dueDate: Joi.date().required(),
+	completed: Joi.boolean().default(false).optional(),
 });

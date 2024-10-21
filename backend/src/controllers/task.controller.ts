@@ -23,7 +23,7 @@ export const createUserTask = wrapperHelper(
 			description,
 			dueDate: new Date(dueDate),
 		});
-		res.status(StatusCodes.OK).send(createdTask);
+		res.status(StatusCodes.CREATED).send(createdTask);
 	}
 );
 

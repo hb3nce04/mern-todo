@@ -32,11 +32,11 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
+		<Toaster position="bottom-right" />{" "}
 		<Flowbite>
 			<RouterProvider router={router}>
 				<AuthProvider>
 					<DarkThemeToggle className="fixed bottom-5 right-5" />
-					<Toaster position="bottom-right" />{" "}
 				</AuthProvider>
 			</RouterProvider>
 		</Flowbite>

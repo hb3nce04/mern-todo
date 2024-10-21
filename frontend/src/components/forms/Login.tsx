@@ -30,11 +30,25 @@ function Login({ changeForm }) {
 			email: "",
 			password: "",
 		},
-		onSubmit: (values) => {
-			if (!isLoading("login")) {
-				handleButton("login", true);
-				//login(values.email, values.password, setIsLoading);
-			}
+		onSubmit: async (values) => {
+			handleButton("local", true);
+
+			await axios
+				.post("/auth/local", {
+					email: values.email,
+					password: values.password,
+				})
+				.then((res) => {
+					handleButton("local", false);
+					toast.success(res.data.message);
+					console.log(res);
+				})
+				.catch((err) => {
+					handleButton("local", false);
+
+					toast.error(err.response.data.message);
+					console.error(err);
+				});
 		},
 	});
 
@@ -53,29 +67,81 @@ function Login({ changeForm }) {
 				Welcome to <span className="text-primary-500">TODO!</span>
 			</h1>
 			<form
-				className="flex max-w flex-col gap-4"
+				className="flex max-w flex-col gap-2"
 				onSubmit={formik.handleSubmit}
 			>
-				<Label htmlFor="name" value="Your email" />
-				<TextInput
-					id="name"
-					type="email"
-					onChange={formik.handleChange}
-					value={formik.values.email}
-					required
-				/>
-				<Label htmlFor="password" value="Your password" />
-				<TextInput
-					id="password"
-					type="password"
-					required
-					onChange={formik.handleChange}
-					value={formik.values.password}
-				/>
+				<div className="flex flex-col relative h-20">
+					<Label
+						htmlFor="email1"
+						value="Email address"
+						style={{ marginBottom: 5 }}
+						color={
+							formik.errors.email
+								? "failure"
+								: formik.touched.email
+								? "success"
+								: ""
+						}
+					/>
+					<TextInput
+						id="email"
+						type="email"
+						onChange={formik.handleChange}
+						value={formik.values.email}
+						onBlur={formik.handleBlur}
+						required
+						color={
+							formik.errors.email
+								? "failure"
+								: formik.touched.email
+								? "success"
+								: ""
+						}
+					/>
+					{formik.errors.email && (
+						<span className="text-xs p-1 text-red-800">
+							{formik.errors.email}
+						</span>
+					)}
+				</div>
+				<div className="flex flex-col relative h-20">
+					<Label
+						htmlFor="password"
+						value="Password"
+						style={{ marginBottom: 5 }}
+						color={
+							formik.errors.password
+								? "failure"
+								: formik.touched.password
+								? "success"
+								: ""
+						}
+					/>
+					<TextInput
+						id="password"
+						type="password"
+						required
+						onChange={formik.handleChange}
+						value={formik.values.password}
+						onBlur={formik.handleBlur}
+						color={
+							formik.errors.password
+								? "failure"
+								: formik.touched.password
+								? "success"
+								: ""
+						}
+					/>
+					{formik.errors.password && (
+						<span className="text-xs p-1 text-red-800">
+							{formik.errors.password}
+						</span>
+					)}
+				</div>
 				<Button
 					color="blue"
 					fullSized
-					isProcessing={isLoading("login")}
+					isProcessing={isLoading("local")}
 					type="submit"
 				>
 					Log in

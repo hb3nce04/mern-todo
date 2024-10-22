@@ -3,10 +3,11 @@ import { Button, HR, Label, TextInput } from "flowbite-react";
 import { FaGoogle } from "react-icons/fa";
 import { useContext, useState } from "react";
 import { useFormik } from "formik";
-import toast from "react-hot-toast";
 import axios from "../../libs/axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/Auth";
+import { loginSchema } from "../../utils/validationSchema";
+import toast from "react-hot-toast";
 
 function Login({ changeForm }) {
 	const [buttonState, setButtonState] = useState({});
@@ -23,31 +24,26 @@ function Login({ changeForm }) {
 		return buttonState[id] || false;
 	};
 
-	//const { login, logout } = useContext(AuthContext);
+	const { login } = useContext(AuthContext);
 
 	const formik = useFormik({
 		initialValues: {
 			email: "",
 			password: "",
 		},
-		onSubmit: async (values) => {
+		validationSchema: loginSchema,
+		onSubmit: (values) => {
 			handleButton("local", true);
-
-			await axios
-				.post("/auth/local", {
-					email: values.email,
-					password: values.password,
-				})
+			login(values.email, values.password)
 				.then((res) => {
-					handleButton("local", false);
-					toast.success(res.data.message);
-					console.log(res);
+					toast.success(res);
+					navigate("/home");
 				})
 				.catch((err) => {
+					toast.error(err);
+				})
+				.finally(() => {
 					handleButton("local", false);
-
-					toast.error(err.response.data.message);
-					console.error(err);
 				});
 		},
 	});

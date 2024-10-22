@@ -1,26 +1,10 @@
-import { Card, Button, Label, TextInput } from "flowbite-react";
+import { Button, Label, TextInput } from "flowbite-react";
 
-import * as yup from "yup";
 import { useState } from "react";
 import { useFormik } from "formik";
 import axios from "../../libs/axios";
 import toast from "react-hot-toast";
-
-const validationSchema = yup.object({
-	email: yup
-		.string()
-		.email("Hibás e-mail cím")
-		.required("E-mail cím megadása kötelező"),
-	password: yup
-		.string()
-		.min(6, "A jelszó rövid (Min. 6 karakter)")
-		.required("Jelszó megadása kötelező"),
-	password2: yup
-		.string()
-		.min(6, "A jelszó rövid (Min. 6 karakter)")
-		.oneOf([yup.ref("password"), null], "A jelszavaknak egyezniük kell")
-		.required("Jelszó megadása kötelező"),
-});
+import { registerSchema } from "../../utils/validationSchema";
 
 function Register({ changeForm }) {
 	const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +15,7 @@ function Register({ changeForm }) {
 			password: "",
 			password2: "",
 		},
-		validationSchema: validationSchema,
+		validationSchema: registerSchema,
 		onSubmit: async (values) => {
 			setIsLoading(true);
 			await axios

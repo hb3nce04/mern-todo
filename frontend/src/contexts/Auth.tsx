@@ -1,20 +1,20 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "../libs/axios";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
-	login: (
-		name: string,
-		password: string,
-		loading: (isLoading: boolean) => void
-	) => void;
+	login: (email: string, password: string) => void;
 	logout: () => void;
+	user: any;
 }
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthContext = createContext<AuthContextType>({
+	login: () => {},
+	logout: () => {},
+	user: null,
+});
+
+export const AuthProvider = ({ children }: any) => {
 	const [user, setUser] = useState(false);
-	//const navigate = useNavigate();
 
 	useEffect(() => {
 		const savedUser = localStorage.getItem("user");
@@ -23,34 +23,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	}, []);
 
-	const login = (name: string, password: string, loading: any) => {
-		loading(true);
-		axios
-			.post("/auth/login", { name, password })
-			.then((res) => {
-				localStorage.setItem("token", res.data.token);
-				toast.success(res.data.message);
-				//navigate.push("/home");
-				loading(false);
-			})
-			.catch((err) => {
-				toast.error(err.response.data.message);
-				loading(false);
-			});
+	const login = (email: string, password: string): Promise<string> => {
+		return new Promise((resolve, reject) => {
+			axios
+				.post("/auth/local", { email, password })
+				.then((res) => {
+					setUser(res.data.user);
+					localStorage.setItem("user", JSON.stringify(res.data.user));
+					resolve(res.data.message || "Logged in successfully");
+				})
+				.catch((err) => {
+					reject(err.response.data.message || "An error occurred");
+				});
+		});
 	};
 
 	const logout = () => {
-		setUser(null);
+		setUser(false);
 		localStorage.removeItem("user");
 	};
 
 	return (
-		<AuthContext.Provider value={{ login, logout }}>
+		<AuthContext.Provider value={{ login, logout, user }}>
 			{children}
 		</AuthContext.Provider>
 	);
 };
-
-export const AuthContext = createContext<AuthContextType | undefined>(
-	undefined
-);

@@ -9,36 +9,46 @@ import MainPage from "./pages/Main.tsx";
 import { Toaster } from "react-hot-toast";
 import { DarkThemeToggle, Flowbite } from "flowbite-react";
 import { AuthProvider } from "./contexts/Auth.tsx";
+import { NotProtectedRoute } from "./routes/NotProtectedRoute.tsx";
+import { ProtectedRoute } from "./routes/ProtectedRoute.tsx";
+import { IndexRoute } from "./routes/IndexRoute.tsx";
 
 // https://www.behance.net/gallery/207897075/To-Do-List-Dashboard?tracking_source=search_projects|todo+list&l=1
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <div>Home</div>,
+		element: <IndexRoute />,
 		errorElement: <ErrorPage />,
 	},
 	{
 		path: "/signin",
-		element: <SignInPage />,
+		element: (
+			<NotProtectedRoute>
+				<SignInPage />
+			</NotProtectedRoute>
+		),
 		errorElement: <ErrorPage />,
 	},
 	{
 		path: "/home",
-		element: <MainPage />,
+		element: (
+			<ProtectedRoute>
+				<MainPage />
+			</ProtectedRoute>
+		),
 		errorElement: <ErrorPage />,
 	},
 ]);
 
-createRoot(document.getElementById("root")).render(
+createRoot(document.getElementById("root")!).render(
 	<StrictMode>
 		<Toaster position="bottom-right" />{" "}
-		<Flowbite>
-			<RouterProvider router={router}>
-				<AuthProvider>
-					<DarkThemeToggle className="fixed bottom-5 right-5" />
-				</AuthProvider>
-			</RouterProvider>
-		</Flowbite>
+		<AuthProvider>
+			<Flowbite>
+				<DarkThemeToggle className="fixed bottom-5 right-5" />
+				<RouterProvider router={router}></RouterProvider>
+			</Flowbite>
+		</AuthProvider>
 	</StrictMode>
 );

@@ -1,4 +1,4 @@
-import User from "../models/user.model";
+import User, { IUser } from "../models/user.model";
 
 /**
  * Finds a user by their local email.
@@ -39,4 +39,8 @@ export const createUser = async (email: string, password: string) => {
 			password,
 		},
 	});
+};
+
+export const deleteUserById = async (id: string): Promise<IUser | null> => {
+	return await User.findByIdAndDelete(id);
 };

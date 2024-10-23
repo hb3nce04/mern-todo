@@ -1,15 +1,15 @@
 import express from "express";
 
 import {
-	getUserTasks,
-	getUserTaskById,
-	createUserTask,
-	deleteUserTask,
-	updateUserTask,
+	getMyTasks,
+	getMyTaskById,
+	createMyTask,
+	deleteMyTask,
+	updateMyTask,
 } from "../controllers/task.controller";
 import { verifyJwtToken } from "../middlewares/jwt.middleware";
 import { validationMiddleware } from "../middlewares/validation.middleware";
-import { taskSchema } from "../utils/validation.util";
+import { taskSchema } from "../utils";
 
 const router = express.Router();
 
@@ -17,10 +17,10 @@ const router = express.Router();
 router.use(verifyJwtToken);
 
 // Task routes
-router.get("/", getUserTasks);
-router.get("/:id", getUserTaskById);
-router.post("/", validationMiddleware(taskSchema), createUserTask);
-router.delete("/:id", deleteUserTask);
-router.put("/:id", validationMiddleware(taskSchema), updateUserTask);
+router.get("/", getMyTasks);
+router.get("/:id", getMyTaskById);
+router.post("/", validationMiddleware(taskSchema), createMyTask);
+router.delete("/:id", deleteMyTask);
+router.put("/:id", validationMiddleware(taskSchema), updateMyTask);
 
 export default router;

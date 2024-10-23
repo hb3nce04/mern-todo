@@ -1,8 +1,7 @@
 import { Response, NextFunction } from "express";
 import createHttpError from "http-errors";
-import { wrapperHelper } from "../helpers/wrapper.helper";
+import { UserRequest, wrapperHelper } from "../utils";
 import { JwtPayload, verify } from "jsonwebtoken";
-import { UserRequest } from "../types/user.request.interface";
 import User from "../models/user.model";
 
 export const verifyJwtToken = wrapperHelper(

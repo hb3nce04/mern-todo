@@ -1,10 +1,11 @@
 import createHttpError from "http-errors";
-import { wrapperHelper } from "../helpers/wrapper.helper";
+import { UserRequest, wrapperHelper } from "../utils";
 import { StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
 import {
-	findUserByEmail,
 	createUser as createUserService,
+	deleteUserById,
+	findUserByEmail,
 } from "../services/user.service";
 
 interface CreateUserRequest extends Request {
@@ -46,11 +47,21 @@ export const createUser = wrapperHelper(
 	}
 );
 
+export const deleteMe = wrapperHelper(
+	async (req: UserRequest, res: Response) => {
+		const userId: string = req.user.id;
+		const user = await deleteUserById(userId);
+		if (!user) {
+			throw createHttpError(StatusCodes.NOT_FOUND, "User not found");
+		}
+		res.status(StatusCodes.OK).json({ message: "Successfully deleted" });
+	}
+);
+
 // export const forgotPassword = async (req: Request, res: Response) => {};
 // export const resetPassword = async (req: Request, res: Response) => {};
 // export const changePassword = async (req: Request, res: Response) => {};
 // export const changeEmail = async (req: Request, res: Response) => {};
-// export const deleteUser = async (req: Request, res: Response) => {};
 // export const getUser = async (req: Request, res: Response) => {};
 // export const getUsers = async (req: Request, res: Response) => {};
 // export const updateUser = async (req: Request, res: Response) => {};
@@ -60,13 +71,4 @@ export const createUser = wrapperHelper(
 // export const uploadAvatar = async (req: Request, res: Response) => {};
 // export const deleteAvatar = async (req: Request, res: Response) => {};
 // export const verifyEmail = async (req: Request, res: Response) => {};
-// export const resendVerificationEmail = async (
-// 	req: Request,
-// 	res: Response
-// ) => {};
-// export const sendPasswordResetEmail = async (req: Request, res: Response) => {};
-// export const sendEmailChangeEmail = async (req: Request, res: Response) => {};
-// export const sendEmailChangeVerificationEmail = async (
-// 	req: Request,
-// 	res: Response
-// ) => {};
+// export const resendVerificationEmail = async (req: Request, res: Response) => {};

@@ -1,7 +1,6 @@
 import { Response } from "express";
-import { wrapperHelper } from "../helpers/wrapper.helper";
+import { UserRequest, wrapperHelper, validateObjectId } from "../utils";
 import { StatusCodes } from "http-status-codes";
-import { UserRequest } from "../types/user.request.interface";
 import createHttpError from "http-errors";
 import {
 	createTask,
@@ -12,7 +11,7 @@ import {
 } from "../services/task.service";
 import { ITask } from "../models/task.model";
 
-export const createUserTask = wrapperHelper(
+export const createMyTask = wrapperHelper(
 	async (req: UserRequest, res: Response) => {
 		const { priority, title, description, dueDate } = req.body;
 		const userId: string = req.user.id;
@@ -27,7 +26,7 @@ export const createUserTask = wrapperHelper(
 	}
 );
 
-export const getUserTasks = wrapperHelper(
+export const getMyTasks = wrapperHelper(
 	async (req: UserRequest, res: Response) => {
 		const userId: string = req.user.id;
 		const tasks = await getTasks(userId);
@@ -35,9 +34,12 @@ export const getUserTasks = wrapperHelper(
 	}
 );
 
-export const getUserTaskById = wrapperHelper(
+export const getMyTaskById = wrapperHelper(
 	async (req: UserRequest, res: Response) => {
 		const { id } = req.params;
+		if (!validateObjectId(id)) {
+			throw createHttpError.BadRequest("Invalid ObjectId");
+		}
 		const userId: string = req.user.id;
 		const task = await getTask(userId, id);
 		if (!task) {
@@ -48,9 +50,12 @@ export const getUserTaskById = wrapperHelper(
 );
 
 // TODO: PATCH METHOD!
-export const updateUserTask = wrapperHelper(
+export const updateMyTask = wrapperHelper(
 	async (req: UserRequest, res: Response) => {
 		const { id } = req.params;
+		if (!validateObjectId(id)) {
+			throw createHttpError.BadRequest("Invalid ObjectId");
+		}
 		const userId: string = req.user.id;
 		const { priority, title, description, dueDate } = req.body;
 		const updatedTask = await updateTask(userId, id, {
@@ -69,9 +74,12 @@ export const updateUserTask = wrapperHelper(
 	}
 );
 
-export const deleteUserTask = wrapperHelper(
+export const deleteMyTask = wrapperHelper(
 	async (req: UserRequest, res: Response) => {
 		const { id } = req.params;
+		if (!validateObjectId(id)) {
+			throw createHttpError.BadRequest("Invalid ObjectId");
+		}
 		const userId: string = req.user.id;
 		const deletedTask = await deleteTask(userId, id);
 		if (!deletedTask) {

@@ -4,7 +4,7 @@ import {
 	handleGoogleAuth,
 	handleGoogleCallback,
 } from "../controllers/auth.controller";
-import { loginSchema } from "../utils/validation.util";
+import { loginSchema } from "../utils";
 import { validationMiddleware } from "../middlewares/validation.middleware";
 import { Router } from "express";
 import {

@@ -1,5 +1,5 @@
 import Task, { ITask } from "../models/task.model";
-import { validateAndConvertObjectId } from "../utils/objectid.util";
+import { convertObjectId } from "../utils";
 
 export const createTask = async (task: ITask): Promise<any> => {
 	return await Task.create(task);
@@ -13,12 +13,12 @@ export const getTasks = async (
 		return await Task.find({ userId });
 	}
 	if (!userId && taskId) {
-		return await Task.find({ _id: validateAndConvertObjectId(taskId) });
+		return await Task.find({ _id: convertObjectId(taskId) });
 	}
 	if (userId && taskId) {
 		return await Task.find({
 			userId,
-			_id: validateAndConvertObjectId(taskId),
+			_id: convertObjectId(taskId),
 		});
 	}
 	return null;
@@ -32,12 +32,12 @@ export const getTask = async (
 		return await Task.findOne({ userId });
 	}
 	if (!userId && taskId) {
-		return await Task.findOne({ _id: validateAndConvertObjectId(taskId) });
+		return await Task.findOne({ _id: convertObjectId(taskId) });
 	}
 	if (userId && taskId) {
 		return await Task.findOne({
 			userId,
-			_id: validateAndConvertObjectId(taskId),
+			_id: convertObjectId(taskId),
 		});
 	}
 	return null;
@@ -49,7 +49,7 @@ export const updateTask = async (
 	task: ITask
 ): Promise<ITask | null> => {
 	return await Task.findOneAndUpdate(
-		{ userId, _id: validateAndConvertObjectId(taskId) },
+		{ userId, _id: convertObjectId(taskId) },
 		task,
 		{
 			new: true,
@@ -63,6 +63,6 @@ export const deleteTask = async (
 ): Promise<ITask | null> => {
 	return await Task.findOneAndDelete({
 		userId,
-		_id: validateAndConvertObjectId(taskId),
+		_id: convertObjectId(taskId),
 	});
 };

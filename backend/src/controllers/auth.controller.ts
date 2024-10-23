@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
 import createHttpError from "http-errors";
-import { wrapperHelper } from "../helpers/wrapper.helper";
+import { wrapperHelper, COOKIE_OPTIONS, createJWTToken } from "../utils";
 import { StatusCodes } from "http-status-codes";
 import User from "../models/user.model";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
-import { jwtTokenCookieOptions } from "../utils/cookie.util";
-import { createJWTToken } from "../utils/jwt.util";
 import {
 	findUserByGoogleId,
 	findUserByLocalEmail,
@@ -34,7 +32,7 @@ export const handleLocalAuth = wrapperHelper(
 		}
 
 		res
-			.cookie("token", createJWTToken(existingUser), jwtTokenCookieOptions)
+			.cookie("token", createJWTToken(existingUser), COOKIE_OPTIONS)
 			.status(StatusCodes.OK)
 			.json({
 				message: "Logged in successfully",
@@ -108,7 +106,7 @@ export const handleGoogleCallback = wrapperHelper(
 		}
 
 		res
-			.cookie("token", createJWTToken(existingUser), jwtTokenCookieOptions)
+			.cookie("token", createJWTToken(existingUser), COOKIE_OPTIONS)
 			.status(StatusCodes.SEE_OTHER)
 			.send("Login successful! You can close this tab now.");
 	}

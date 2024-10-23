@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { wrapperHelper } from "../helpers/wrapper.helper";
+import { wrapperHelper } from "../utils";
 import createHttpError from "http-errors";
 import Joi from "joi";
 
@@ -11,7 +11,7 @@ export const validationMiddleware = (schema: Joi.Schema) => {
 				.then(() => next())
 				.catch((err: any) => {
 					//res.status(StatusCodes.BAD_REQUEST).json({ message: err.message });
-					throw new createHttpError.BadRequest(err.message);
+					throw createHttpError.BadRequest(err.message);
 				});
 		}
 	);

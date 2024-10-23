@@ -1,7 +1,8 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
 export interface ITask {
-	userId: string; // TODO: Types.ObjectId???
+	userId: Types.ObjectId | string;
+	folderId?: Types.ObjectId | string;
 	priority: "low" | "medium" | "high";
 	title: string;
 	description?: string;
@@ -15,6 +16,10 @@ const schema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
+		},
+		folderId: {
+			type: Schema.Types.ObjectId,
+			ref: "Folder",
 		},
 		priority: {
 			type: String,

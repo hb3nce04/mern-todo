@@ -1,6 +1,14 @@
 import { Sidebar } from "flowbite-react";
 
-import { HiChartPie } from "react-icons/hi";
+import { MdKeyboardDoubleArrowRight } from "react-icons/md";
+import { FaTasks } from "react-icons/fa";
+import { FaCalendarAlt } from "react-icons/fa";
+import { FaStickyNote } from "react-icons/fa";
+import { FaFolder } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
+
+import { VscSettings } from "react-icons/vsc";
+import { FaSignOutAlt } from "react-icons/fa";
 
 function Component() {
 	return (
@@ -36,8 +44,33 @@ function Component() {
 				</Sidebar.Logo>
 				<Sidebar.Items>
 					<Sidebar.ItemGroup>
-						<Sidebar.Item href="#" icon={HiChartPie}>
-							Home
+						<Sidebar.Item href="#" icon={MdKeyboardDoubleArrowRight}>
+							Upcoming
+						</Sidebar.Item>
+						<Sidebar.Item href="#" icon={FaTasks}>
+							Today
+						</Sidebar.Item>
+						<Sidebar.Item href="#" icon={FaCalendarAlt}>
+							Calendar
+						</Sidebar.Item>
+						<Sidebar.Item href="#" icon={FaStickyNote}>
+							Sticky Wall
+						</Sidebar.Item>
+						<Sidebar.Item href="#" icon={FaFolder}>
+							Folders
+						</Sidebar.Item>
+					</Sidebar.ItemGroup>
+					<Sidebar.ItemGroup>
+						<Sidebar.Item href="#" icon={FaPlus}>
+							Add new list
+						</Sidebar.Item>
+					</Sidebar.ItemGroup>
+					<Sidebar.ItemGroup>
+						<Sidebar.Item href="#" icon={VscSettings}>
+							Settings
+						</Sidebar.Item>
+						<Sidebar.Item href="#" icon={FaSignOutAlt}>
+							Sign out
 						</Sidebar.Item>
 					</Sidebar.ItemGroup>
 				</Sidebar.Items>
@@ -45,5 +78,7 @@ function Component() {
 		</>
 	);
 }
+
+// TODO: TAGS
 
 export default Component;

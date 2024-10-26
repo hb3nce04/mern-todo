@@ -12,32 +12,59 @@ import { AuthProvider } from "./contexts/Auth.tsx";
 import { NotProtectedRoute } from "./routes/NotProtectedRoute.tsx";
 import { ProtectedRoute } from "./routes/ProtectedRoute.tsx";
 import { IndexRoute } from "./routes/IndexRoute.tsx";
+import Layout from "./components/Layout.tsx";
+import StickyWall from "./pages/StickyWall.tsx";
+import Upcoming from "./pages/Upcoming.tsx";
 
 // https://www.behance.net/gallery/207897075/To-Do-List-Dashboard?tracking_source=search_projects|todo+list&l=1
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <IndexRoute />,
+		element: <Layout />,
 		errorElement: <ErrorPage />,
-	},
-	{
-		path: "/signin",
-		element: (
-			<NotProtectedRoute>
-				<SignInPage />
-			</NotProtectedRoute>
-		),
-		errorElement: <ErrorPage />,
-	},
-	{
-		path: "/home",
-		element: (
-			<ProtectedRoute>
-				<MainPage />
-			</ProtectedRoute>
-		),
-		errorElement: <ErrorPage />,
+		children: [
+			{
+				path: "/",
+				element: <IndexRoute />,
+			},
+			{
+				path: "/signin",
+				element: (
+					<NotProtectedRoute>
+						<SignInPage />
+					</NotProtectedRoute>
+				),
+				errorElement: <ErrorPage />,
+			},
+			{
+				path: "/home",
+				element: (
+					<ProtectedRoute>
+						<MainPage />
+					</ProtectedRoute>
+				),
+				errorElement: <ErrorPage />,
+			},
+			{
+				path: "/sticky",
+				element: (
+					<ProtectedRoute>
+						<StickyWall />
+					</ProtectedRoute>
+				),
+				errorElement: <ErrorPage />,
+			},
+			{
+				path: "/upcoming",
+				element: (
+					<ProtectedRoute>
+						<Upcoming />
+					</ProtectedRoute>
+				),
+				errorElement: <ErrorPage />,
+			},
+		],
 	},
 ]);
 

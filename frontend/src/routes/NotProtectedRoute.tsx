@@ -4,5 +4,5 @@ import { Navigate } from "react-router-dom";
 
 export const NotProtectedRoute = ({ children }: { children: ReactNode }) => {
 	const { user } = useContext(AuthContext);
-	return user ? <Navigate to="/home" /> : children;
+	return !user ? children : <Navigate to="/home" />;
 };

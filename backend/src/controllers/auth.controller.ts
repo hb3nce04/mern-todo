@@ -107,8 +107,12 @@ export const handleGoogleCallback = wrapperHelper(
 
 		res
 			.cookie("token", createJWTToken(existingUser), COOKIE_OPTIONS)
-			.status(StatusCodes.SEE_OTHER)
-			.send("Login successful! You can close this tab now.");
+			.status(StatusCodes.OK)
+			.json({
+				message: "Logged in successfully",
+				user: { id: existingUser.id, email: existingUser.local!.email }, // TODO
+			})
+			.redirect(process.env.FRONTEND_URL!);
 	}
 );
 

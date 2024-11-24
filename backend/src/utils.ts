@@ -32,7 +32,7 @@ export const COOKIE_OPTIONS = {
 /**
  * Global function to create JWT token
  */
-export const createJWTToken = (user: any): string => {
+export const createJWTToken = (user: JwtPayload): string => {
 	return sign({ iss: "hb3nce04", id: user._id }, process.env.JWT_SECRET ?? "", {
 		expiresIn: process.env.JWT_LIFETIME,
 	});

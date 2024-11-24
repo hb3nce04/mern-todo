@@ -19,6 +19,7 @@ const limiter = rateLimit({
 	windowMs: 1000,
 });
 
+app.use(morgan("dev"));
 app.use(
 	process.env.NODE_ENV === "production" ? morgan("combined") : morgan("dev")
 );

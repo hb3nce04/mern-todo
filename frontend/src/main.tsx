@@ -17,6 +17,7 @@ import StickyWall from "./pages/StickyWall.tsx";
 import Upcoming from "./pages/Upcoming.tsx";
 
 // https://www.behance.net/gallery/207897075/To-Do-List-Dashboard?tracking_source=search_projects|todo+list&l=1
+// https://uizard.io/templates/website-templates/to-do-website/
 
 const router = createBrowserRouter([
 	{
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
 			{
 				path: "/",
 				element: <IndexRoute />,
+				index: true,
 			},
 			{
 				path: "/signin",

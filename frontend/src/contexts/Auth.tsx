@@ -14,7 +14,7 @@ export const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: any) => {
-	const [user, setUser] = useState(true);
+	const [user, setUser] = useState(true); // TODO
 
 	useEffect(() => {
 		const savedUser = localStorage.getItem("user");

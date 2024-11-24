@@ -55,7 +55,7 @@ function Register({ changeForm }) {
 								? "failure"
 								: formik.touched.email
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					<TextInput
@@ -70,7 +70,7 @@ function Register({ changeForm }) {
 								? "failure"
 								: formik.touched.email
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					{formik.errors.email && (
@@ -89,7 +89,7 @@ function Register({ changeForm }) {
 								? "failure"
 								: formik.touched.password
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					<TextInput
@@ -104,7 +104,7 @@ function Register({ changeForm }) {
 								? "failure"
 								: formik.touched.password
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					{formik.errors.password && (
@@ -123,7 +123,7 @@ function Register({ changeForm }) {
 								? "failure"
 								: formik.touched.password2
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					<TextInput
@@ -138,7 +138,7 @@ function Register({ changeForm }) {
 								? "failure"
 								: formik.touched.password2
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					{formik.errors.password2 && (

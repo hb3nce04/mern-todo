@@ -1,7 +1,7 @@
 import { Button, HR, Label, TextInput } from "flowbite-react";
 
 import { FaGoogle } from "react-icons/fa";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { useFormik } from "formik";
 import axios from "../../libs/axios";
 import { useNavigate } from "react-router-dom";
@@ -9,20 +9,9 @@ import { AuthContext } from "../../contexts/Auth";
 import { loginSchema } from "../../utils/validationSchema";
 import toast from "react-hot-toast";
 
+// TODO: AUTH implementation
 function Login({ changeForm }) {
-	const [buttonState, setButtonState] = useState({});
 	const navigate = useNavigate();
-
-	const handleButton = (id, state) => {
-		setButtonState({
-			...buttonState,
-			[id]: state,
-		});
-	};
-
-	const isLoading = (id) => {
-		return buttonState[id] || false;
-	};
 
 	const { login } = useContext(AuthContext);
 
@@ -33,28 +22,21 @@ function Login({ changeForm }) {
 		},
 		validationSchema: loginSchema,
 		onSubmit: (values) => {
-			handleButton("local", true);
 			login(values.email, values.password)
 				.then((res) => {
 					toast.success(res);
-					navigate("/home");
+					navigate("/dashboard");
 				})
 				.catch((err) => {
 					toast.error(err);
-				})
-				.finally(() => {
-					handleButton("local", false);
 				});
 		},
 	});
 
 	const handleGoogleAuth = async () => {
-		if (!isLoading("google")) {
-			handleButton("google", true);
-			await axios.get("http://localhost:3000/api/auth/google").then((res) => {
-				window.open(res.data.url, "_target");
-			});
-		}
+		await axios.get("/auth/google").then((res) => {
+			window.open(res.data.url, "_target");
+		});
 	};
 
 	return (
@@ -76,7 +58,7 @@ function Login({ changeForm }) {
 								? "failure"
 								: formik.touched.email
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					<TextInput
@@ -91,7 +73,7 @@ function Login({ changeForm }) {
 								? "failure"
 								: formik.touched.email
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					{formik.errors.email && (
@@ -110,7 +92,7 @@ function Login({ changeForm }) {
 								? "failure"
 								: formik.touched.password
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					<TextInput
@@ -125,7 +107,7 @@ function Login({ changeForm }) {
 								? "failure"
 								: formik.touched.password
 								? "success"
-								: ""
+								: undefined
 						}
 					/>
 					{formik.errors.password && (
@@ -134,12 +116,7 @@ function Login({ changeForm }) {
 						</span>
 					)}
 				</div>
-				<Button
-					color="blue"
-					fullSized
-					isProcessing={isLoading("local")}
-					type="submit"
-				>
+				<Button color="blue" fullSized type="submit">
 					Log in
 				</Button>
 				<Button color="light" fullSized onClick={changeForm}>
@@ -148,15 +125,10 @@ function Login({ changeForm }) {
 				<HR.Text
 					text="OR"
 					theme={{
-						text: "dark:bg-gray-800 bg-slate-300 p-2 left-50",
+						text: "absolute left-1/2 -translate-x-1/2 bg-slate-300 font-medium dark:bg-gray-800 text-gray-900 dark:bg-gray-800 dark:text-white",
 					}}
 				/>
-				<Button
-					color="blue"
-					fullSized
-					isProcessing={isLoading("google")}
-					onClick={handleGoogleAuth}
-				>
+				<Button color="blue" fullSized onClick={handleGoogleAuth}>
 					<FaGoogle className="my-auto mx-2 text-xl" />
 					Sign in with Google
 				</Button>

@@ -12,6 +12,8 @@ import { FaSignOutAlt } from "react-icons/fa";
 import { IoMenuOutline } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
 
+import { LuListChecks } from "react-icons/lu";
+
 function Component() {
 	const location = useLocation();
 	const currentPath = location.pathname;
@@ -34,12 +36,13 @@ function Component() {
 				<IoMenuOutline className="text-2xl" />
 			</button>
 			<Sidebar className="fixed top-0 left-0 z-40 w-60 h-screen transition-transform -translate-x-full sm:translate-x-0">
-				<Sidebar.Logo
-					href="/"
-					img="https://jameslex.com/content/images/2022/02/MS-To-Do-Icon-MacOS-512x512@2x-1.png"
-				>
-					TODO App
+				<Sidebar.Logo href="/">
+					<div className="flex gap-2 text-primary-300">
+						<LuListChecks className="my-auto" />
+						<span className="font-bold">ToDo App</span>
+					</div>
 				</Sidebar.Logo>
+
 				<Sidebar.Items>
 					<Sidebar.ItemGroup>
 						<Sidebar.Item
